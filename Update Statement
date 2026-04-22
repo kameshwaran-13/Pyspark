@@ -1,0 +1,40 @@
+from pyspark.sql import SparkSession
+
+# Create a session (your entry point to everything)
+spark = SparkSession.builder \
+    .appName("MyFirstSpark") \
+    .config("spark.hadoop.fs.defaultFS", "file:///") \
+    .config("spark.hadoop.fs.file.impl", "org.apache.hadoop.fs.LocalFileSystem") \
+    .config("spark.sql.warehouse.dir", "C:\\tmp\\spark-warehouse") \
+    .config("spark.driver.extraJavaOptions", "-Djava.security.manager=allow") \
+    .config("spark.executor.extraJavaOptions", "-Djava.security.manager=allow") \
+    .getOrCreate()
+
+# Read a CSV file into a DataFrame
+df = spark.read.csv("customers-100.csv", header=True, inferSchema=True)
+
+df.show()
+
+my_df_schema = ''' 
+root
+ |-- Index: integer (nullable = true)
+ |-- Customer Id: string (nullable = true)
+ |-- First Name: string (nullable = true)
+ |-- Last Name: string (nullable = true)
+ |-- Company: string (nullable = true)
+ |-- City: string (nullable = true)
+ |-- Country: string (nullable = true)
+ |-- Phone 1: string (nullable = true)
+ |-- Phone 2: string (nullable = true)
+ |-- Email: string (nullable = true)
+ |-- Subscription Date: date (nullable = true)
+ |-- Website: string (nullable = true)
+'''
+
+# Print the schema of the DataFrame
+df = spark.read.format('csv')\
+    .schema(my_df_schema)\
+    .option('header', 'true')\
+    .load("customers-100.csv")
+
+df.printSchema() 

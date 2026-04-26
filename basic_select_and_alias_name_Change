@@ -1,0 +1,40 @@
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+
+# Create Spark session
+spark = SparkSession.builder \
+    .appName("CSVReader") \
+    .master("local[*]") \
+    .config("spark.driver.extraJavaOptions", "-Djava.security.manager=allow") \
+    .getOrCreate()
+
+# Define schema manually
+# my_schema = StructType([
+#     StructField("Index", IntegerType(), True),
+#     StructField("Customer Id", StringType(), True),
+#     StructField("First Name", StringType(), True),
+#     StructField("Last Name", StringType(), True),
+#     StructField("Company", StringType(), True),
+#     StructField("City", StringType(), True),
+#     StructField("Country", StringType(), True),
+#     StructField("Phone 1", StringType(), True),
+#     StructField("Phone 2", StringType(), True),
+#     StructField("Email", StringType(), True),
+#     StructField("Subscription Date", StringType(), True),
+#     StructField("Website", StringType(), True)
+# ])
+
+# Read CSV file
+df = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("inferSchema", "false") \
+    .load("customers-100.csv")   # Make sure path is correct
+ 
+#select specific columns
+
+df_select = df.select(col("Customer Id"), col("First Name"), col("Last Name"), col("Email")).show()
+
+#alies name columns
+
+df_alias = df.select(col("First Name").alias("FName")).show()
